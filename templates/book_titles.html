@@ -1,0 +1,19 @@
+{% extends 'layout.html'%}
+
+{% block body%}
+
+<h1>Book Series: </h1>
+{% for i in bookseries %}
+
+<div class="container">
+  <h4><a href=#>{{i.name}}</a></h4>
+    </br>
+    <a href = #>Edit</a>
+    </br>
+    <a href = #>Delete</a>
+</div>
+
+{% endfor %}
+<a href = #>ADD New</a>
+</br>
+{% endblock %}

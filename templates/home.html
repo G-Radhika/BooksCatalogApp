@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <div class="jumbotron text-center">
+    <h1>Welcome To Books Catalog App</h1>
+    <p class="lead"> This App lists all the book series which are over
+      time considered to be fan favourites.</p>
+      <p>You can look at all the books that are listed, share your own
+        experiences and even add new books for others to enjoy.</p>
+    {% if session.logged_in == NULL %}
+      <a href="/register" class="btn btn-primary btn-lg">Register</a>
+      <a href="/login" class="btn btn-success btn-lg">Login</a>
+    {% endif %}
+  </div>
+{% endblock %}
