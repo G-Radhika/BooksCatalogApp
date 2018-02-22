@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import session as login_session
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, BookSeries, IndividualBook
-from flask import session as login_session
 import random
 import string
+#imports for oauth2client
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
@@ -50,6 +51,7 @@ def gconnect():
         return response
     # Obtain authorization code
     code = request.data
+    code = request.data.decode('utf-8')
 
     try:
         # Upgrade the authorization code into a credentials object
@@ -86,7 +88,7 @@ def gconnect():
     if result['issued_to'] != CLIENT_ID:
         response = make_response(
             json.dumps("Token's client ID does not match app's."), 401)
-        print "Token's client ID does not match app's."
+        #print "Token's client ID does not match app's."
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -113,6 +115,12 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+#     # Check if user exists
+# user_id = getUserID(login_session['email'])
+# if not user_id:
+#     user_id = createUser(login_session)
+#     login_session['user_id'] = user_id
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -121,8 +129,32 @@ def gconnect():
     output += login_session['picture']
     output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
-    print "done!"
+    #print "done!"
     return output
+
+# User Helper Functions
+
+def createUser(login_session):
+	newUser = User(name=login_session['username'], email=login_session[
+				   'email'], picture=login_session['picture'])
+	session.add(newUser)
+	session.commit()
+	user = session.query(User).filter_by(email=login_session['email']).one()
+	return user.id
+
+
+def getUserInfo(user_id):
+	user = session.query(User).filter_by(id=user_id).one()
+	return user
+
+
+def getUserID(email):
+	try:
+		user = session.query(User).filter_by(email=email).one()
+		return user.id
+	except:
+		return None
+
 
 
 @app.route('/gdisconnect')
@@ -131,19 +163,19 @@ def gdisconnect():
     DISCONNECT - Revoke a current user's token and reset their login_session
     '''
     access_token = login_session['access_token']
-    print 'In gdisconnect access token is %s', access_token
-    print 'User name is: '
-    print login_session['username']
+    #print 'In gdisconnect access token is %s', access_token
+    #print 'User name is: '
+    #print login_session['username']
     if access_token is None:
- 	print 'Access Token is None'
+ 	#print 'Access Token is None'
     	response = make_response(json.dumps('Current user not connected.'), 401)
     	response.headers['Content-Type'] = 'application/json'
     	return response
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    print 'result is '
-    print result
+    #print 'result is '
+    #print result
     if result['status'] == '200':
 	del login_session['access_token']
     	del login_session['gplus_id']
