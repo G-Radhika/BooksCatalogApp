@@ -4,7 +4,7 @@
 
 <h1>{{bookseries.name}}</h1>
   <div class="container">
-    <a href = '{{url_for('newIndividualBook', bookseries_id = bookseries.id) }}'>New</a>
+    <a href = '{{url_for('newIndividualBook', bookseries_id = bookseries.id) }}'>ADD A New Book To This Series...</a>
     <div class = 'flash'>
     		      {% with messages = get_flashed_messages() %}
           {% if messages %}

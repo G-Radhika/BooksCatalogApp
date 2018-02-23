@@ -218,14 +218,9 @@ def showBookSeries():
 # This page has the NEW/Edit/Delete functionality
 @app.route('/books/<int:bookseries_id>/')
 def booklist(bookseries_id):
-    '''
-    http://localhost:5000/books/1/
-    ERROR: werkzeug.routing.BuildError
-    BuildError: ('deleteBook', {'individualbook_id': 1, 'bookseries_id': 1}, None)
-    '''
     bookseries = session.query(BookSeries).filter_by(id=bookseries_id).first()
-    items = session.query(IndividualBook).filter_by(bookseries_id=bookseries.id)
-    return render_template('books.html', bookseries=bookseries, items=items)
+    individualbook = session.query(IndividualBook).filter_by(bookseries_id=bookseries.id)
+    return render_template('books.html', bookseries=bookseries, items=individualbook)
 # New
 @app.route('/books/<int:bookseries_id>/new', methods=['GET', 'POST'])
 def newIndividualBook(bookseries_id):
@@ -245,7 +240,23 @@ def newIndividualBook(bookseries_id):
     else:
         return render_template('newIndividualBook.html', individualbook_id=individualbook_id)
 # Edit
-@app.route('/bookseries/<int:bookseries_id>/<int:individualbook_id>/edit',methods=['GET', 'POST'])
+# @app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit',
+#            methods=['GET', 'POST'])
+# def editMenuItem(restaurant_id, menu_id):
+#     editedItem = session.query(MenuItem).filter_by(id=menu_id).one()
+#     if request.method == 'POST':
+#         if request.form['name']:
+#             editedItem.name = request.form['name']
+#         session.add(editedItem)
+#         session.commit()
+#         return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
+#     else:
+#         # USE THE RENDER_TEMPLATE FUNCTION BELOW TO SEE THE VARIABLES YOU
+#         # SHOULD USE IN YOUR EDITMENUITEM TEMPLATE
+#         return render_template(
+#             'editmenuitem.html', restaurant_id=restaurant_id, menu_id=menu_id, item=editedItem)
+@app.route('/bookseries/<int:bookseries_id>/<int:individualbook_id>/edit',
+            methods=['GET', 'POST'])
 def editindividualbookItem(bookseries_id, individualbook_id):
     editedItem = session.query(IndividualBook).filter_by(id=individualbook_id).one_or_none()
     if request.method == 'POST':
@@ -266,7 +277,7 @@ def editindividualbookItem(bookseries_id, individualbook_id):
 # Delete
 @app.route('/bookseries/<int:bookseries_id>/<int:individualbook_id>/delete',methods=['GET', 'POST'])
 def deleteindividualbook(bookseries_id, individualbook_id):
-    itemToDelete = session.query(IndividualBookItem).filter_by(id=individualbook_id).one()
+    itemToDelete = session.query(IndividualBook).filter_by(id=individualbook_id).one_or_none()
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()

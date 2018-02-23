@@ -6,14 +6,10 @@
 {% for i in bookseries %}
 
 <div class="container">
-  <h4><a href= #>{{i.name}}</a></h4>
-    </br>
-    <a href= "{{ url_for('editindividualbookItem',bookseries_id=bookseries_id, individualbook_id=individualbook_id)}}" method = 'post'> Edit </a>
-    </br>
-    <a href = #>Delete</a>
+  <h4><a href= "{{ url_for('booklist',bookseries_id=i.id, individualbook_id=i.id)}}">{{i.name}}</a></h4>
 </div>
 
 {% endfor %}
-<a href = #>ADD New</a>
+<a href= #>ADD New</a>
 </br>
 {% endblock %}
