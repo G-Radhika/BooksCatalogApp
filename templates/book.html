@@ -4,7 +4,7 @@
 
 <h1>{{bookseries.name}}</h1>
   <div class="container">
-    <a href = '{{url_for('newIndividualBook', bookseries_id = bookseries.id) }}'>ADD A New Book To This Series...</a>
+    <a href = '{{url_for('newBookItem', bookseries_id = bookseries.id) }}'>ADD A New Book To This Series...</a>
     <div class = 'flash'>
     		      {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -26,9 +26,9 @@
   <h4>{{i.name}}</h4>
   <p>{{i.author}}</p>
 
-  <a href = '{{url_for('editindividualbookItem',bookseries_id = bookseries.id, individualbook_id=i.id)}}' >Edit</a>
+  <a href = '{{url_for('editBookItem',bookseries_id=bookseries.id, book_id=i.id)}}' >Edit</a>
   </br>
-  <a href = '{{url_for('deleteindividualbook', bookseries_id = bookseries.id, individualbook_id=i.id)}}'>Delete</a>
+  <a href = '{{url_for('deleteBookItem', bookseries_id=bookseries.id, book_id=i.id)}}'>Delete</a>
 </div>
 {% endfor %}
 

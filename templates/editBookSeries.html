@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1> Edit Book Series </h1>
+
+<form action="{{ url_for('editBookSeries',bookseries_id = bookseries.id)}}" method = 'post'>
+
+
+	<p>Name:</p>
+		<input type ='text' size='30' name='name' placeholder = '{{bookseries.name }}'>
+
+
+<input type='submit' value='Edit'>
+
+
+<a href = '{{url_for('showBookSeries')}}'> Cancel </a>
+
+</form>
+
+{% endblock%}

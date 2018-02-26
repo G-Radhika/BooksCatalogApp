@@ -3,7 +3,7 @@
 {% block body %}
 <h1> Edit Book  </h1>
 
-<form action="{{ url_for('editindividualbookItem',bookseries_id=bookseries_id, individualbook_id=item.id)}}" method = 'post'>
+<form action= '#' method = 'POST'>
 
 <dl>
   <dt>Name:</dt>
@@ -18,6 +18,6 @@
 
 <input type='submit' value='Edit'>
 
-<a href = '{{url_for('BookList', bookseries_id = item.bookseries_id)}}'> Cancel </a>
+<a href = '{{url_for('booklist', bookseries_id=bookseries_id)}}'> Cancel </a>
 </form>
 {% endblock %}

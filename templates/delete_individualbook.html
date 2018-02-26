@@ -4,7 +4,7 @@
   <h4> Delete Book:  </h4>
   <h1> Are you sure you want to delete {{item.name}}? </h1>
 
-  <form action="{{ url_for('deleteindividualbook',bookseries_id = item.bookseries_id, menu_id=item.id)}}" method = 'post'>
+  <form action="#" method = 'post'>
 
   <input type='submit', value = 'Delete'>
 
@@ -12,8 +12,7 @@
 
 
   </form>
-
-  <a href = '{{url_for('restaurantMenu', bookseries_id = item.bookseries_id)}}'> Cancel </a>
+  <a href = '{{url_for('booklist', bookseries_id=bookseries_id)}}'> Cancel </a>
 </div>
 
 {% endblock %}

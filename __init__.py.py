@@ -30,9 +30,7 @@ session = DBSession()
 
 @app.route('/login')
 def showLogin():
-    '''
-    Create anti-forgery state token
-    '''
+    '''Create anti-forgery state token'''
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -41,9 +39,8 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
-    """
-    Gathers data from Google Sign In API and places it inside a session variable.
-    """
+    '''Gathers data from Google Sign In API and places
+    it inside a session variable.'''
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -95,8 +92,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(json.dumps
+                ('Current user is already connected.'),200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -155,13 +152,10 @@ def getUserID(email):
 	except:
 		return None
 
-
-
 @app.route('/gdisconnect')
 def gdisconnect():
-    '''
-    DISCONNECT - Revoke a current user's token and reset their login_session
-    '''
+    '''DISCONNECT - Revoke a current user's token and
+    reset their login_session'''
     access_token = login_session['access_token']
     #print 'In gdisconnect access token is %s', access_token
     #print 'User name is: '
@@ -187,109 +181,138 @@ def gdisconnect():
     	return response
     else:
 
-    	response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+    	response = make_response(json.dumps
+            ('Failed to revoke token for given user.', 400))
     	response.headers['Content-Type'] = 'application/json'
     	return response
+# jsonify data
+@app.route('/bookseries/<int:bookseries_id>/book/JSON')
+def IndividualBookJSON(bookseries_id):
+    bookseries = session.query(BookSeries).filter_by(id=bookseries_id).one()
+    items = session.query(IndividualBook).filter_by(
+        bookseries_id=bookseries_id).all()
+    return jsonify(IndividualBook=[i.serialize for i in items])
+
+@app.route('/bookseries/<int:bookseries_id>/book/<int:book_id>/JSON')
+def bookItemJSON(bookseries_id, book_id):
+    Book_Item = session.query(IndividualBook).filter_by(id=book_id).one()
+    return jsonify(Book_Item=Book_Item.serialize)
+
+
+@app.route('/bookseries/JSON')
+def bookseriesJSON():
+    bookseries = session.query(BookSeries).all()
+    return jsonify(bookseries=[i.serialize for i in bookseries])
+
 
 @app.route('/')
-@app.route('/home')
+@app.route('/booksCatalog')
 def home():
-    '''
-    Renders static home page @ http://localhost:5000/
-    '''
-    return render_template('home.html')
+    return render_template('booksCatalog.html')
 
 @app.route('/about')
 def about():
-    '''
-    Renders static about page @ http://localhost:5000/about
-    '''
     return render_template('about.html')
+
 # Show titles of book series.
-@app.route('/')
-@app.route('/books/')
+@app.route('/bookseries')
 def showBookSeries():
-    '''
-    Renders all the titles of the Bookseries in this catalog @ http://localhost:5000/books/
-    '''
     bookseries = session.query(BookSeries).all()
     return render_template('book_titles.html', bookseries=bookseries)
-# Show the indivual books in the bookseries.
-# This page has the NEW/Edit/Delete functionality
-@app.route('/books/<int:bookseries_id>/')
-def booklist(bookseries_id):
-    bookseries = session.query(BookSeries).filter_by(id=bookseries_id).first()
-    individualbook = session.query(IndividualBook).filter_by(bookseries_id=bookseries.id)
-    return render_template('books.html', bookseries=bookseries, items=individualbook)
-# New
-@app.route('/books/<int:bookseries_id>/new', methods=['GET', 'POST'])
-def newIndividualBook(bookseries_id):
-
+# ADD NEW BOOK Series
+@app.route('/bookseries/new/', methods=['GET', 'POST'])
+def newBookSeries():
     if request.method == 'POST':
-        newItem = IndividualBook(name=request.form['name'],
-                               author=request.form['author'],
-                               description=request.form['description'],
-                               year=request.form['year'],
-                               genre=request.form['genre'],
-                               language=request.form['language'],
-                               review=request.form['review'],
-                               individualbook_id=individualbook_id)
-        session.add(newItem)
+        newBookSeries = BookSeries(name=request.form['name'])
+        session.add(newBookSeries)
         session.commit()
-        return redirect(url_for('booklist', individualbook_id=individualbook_id))
+        return redirect(url_for('showBookSeries'))
     else:
-        return render_template('newIndividualBook.html', individualbook_id=individualbook_id)
-# Edit
-# @app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit',
-#            methods=['GET', 'POST'])
-# def editMenuItem(restaurant_id, menu_id):
-#     editedItem = session.query(MenuItem).filter_by(id=menu_id).one()
-#     if request.method == 'POST':
-#         if request.form['name']:
-#             editedItem.name = request.form['name']
-#         session.add(editedItem)
-#         session.commit()
-#         return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
-#     else:
-#         # USE THE RENDER_TEMPLATE FUNCTION BELOW TO SEE THE VARIABLES YOU
-#         # SHOULD USE IN YOUR EDITMENUITEM TEMPLATE
-#         return render_template(
-#             'editmenuitem.html', restaurant_id=restaurant_id, menu_id=menu_id, item=editedItem)
-@app.route('/bookseries/<int:bookseries_id>/<int:individualbook_id>/edit',
-            methods=['GET', 'POST'])
-def editindividualbookItem(bookseries_id, individualbook_id):
-    editedItem = session.query(IndividualBook).filter_by(id=individualbook_id).one_or_none()
+        return render_template('new_book_series.html')
+# EDIT BOOK SERIES, if you change your mind click
+# cancle and land on the Book Series Page
+@app.route('/bookseries/<int:bookseries_id>/edit/', methods=['GET', 'POST'])
+def editBookSeries(bookseries_id):
+    editedBookSeries = session.query(
+        BookSeries).filter_by(id=bookseries_id).one()
     if request.method == 'POST':
         if request.form['name']:
-            editedItem.name = request.form['name']
-        if request.form['author']:
-            editedItem.author = request.form['author']
-        if request.form['language']:
-            editedItem.language = request.form['language']
-        if request.form['description']:
-            editedItem.desciption = request.form['description']
-        session.add(editedItem)
+            editedBookSeries.name = request.form['name']
+            return redirect(url_for('showBookSeries'))
+    else:
+        return render_template(
+            'editBookSeries.html', bookseries=editedBookSeries)
+# DELETE Book Series, if you change your mind click cancle and land
+# on the Book Series Page
+@app.route('/bookseries/<int:bookseries_id>/delete/', methods=['GET', 'POST'])
+def deleteBookSeries(bookseries_id):
+    bookSeriesToDelete = session.query(BookSeries).filter_by(id=bookseries_id).one()
+    if request.method == 'POST':
+        session.delete(bookSeriesToDelete)
+        session.commit()
+        return redirect(url_for('showBookSeries', bookseries_id=bookseries_id))
+    else:
+        return render_template('deleteBookSeries.html', bookseries=bookSeriesToDelete)
+
+# Show the indivual books in the bookseries.
+# This page has the NEW/Edit/Delete functionality
+@app.route('/bookseries/<int:bookseries_id>/')
+@app.route('/bookseries/<int:bookseries_id>/book')
+def booklist(bookseries_id):
+    bookseries = session.query(BookSeries).filter_by(id=bookseries_id).first()
+    individualBook = session.query(IndividualBook).filter_by(bookseries_id=bookseries.id)
+    return render_template('book.html', bookseries=bookseries, items=individualBook)
+###ERROR
+#UnboundLocalError: local variable 'newBookItem' referenced before assignment
+
+@app.route('/bookseries/<int:bookseries_id>/book/new/', methods=['GET', 'POST'])
+def newBookItem(bookseries_id):
+    if request.method == 'POST':
+        newBookItem = IndividualBook(name=request.form['name'],
+            author=request.form['author'],
+            language=request.form['language'],
+            description=request.form['description'],
+            bookseries_id=bookseries_id)
+        session.add(newBookItem)
         session.commit()
         return redirect(url_for('booklist', bookseries_id=bookseries_id))
     else:
-        return render_template('editindividualbookItem.html', bookseries_id=bookseries_id, individualbook_id=individualbook_id, item=editedItem)
+        return render_template('new_individual_book.html', bookseries_id=bookseries_id, item=newBookItem)
 
-# Delete
-@app.route('/bookseries/<int:bookseries_id>/<int:individualbook_id>/delete',methods=['GET', 'POST'])
-def deleteindividualbook(bookseries_id, individualbook_id):
-    itemToDelete = session.query(IndividualBook).filter_by(id=individualbook_id).one_or_none()
+@app.route('/bookseries/<int:bookseries_id>/book/<int:book_id>/edit',methods=['GET', 'POST'])
+def editBookItem(bookseries_id, book_id):
+    editedBookItem = session.query(IndividualBook).filter_by(id=book_id).one()
+    if request.method == 'POST':
+        if request.form['name']:
+            editedBookItem.name = request.form['name']
+        if request.form['author']:
+            editedBookItem.author = request.form['author']
+        if request.form['language']:
+            editedBookItem.language = request.form['language']
+        if request.form['discription']:
+            editedBookItem.discription = request.form['discription']
+        session.add(editedBookItem)
+        session.commit()
+        return redirect(url_for('booklist', bookseries_id=bookseries_id))
+    else:
+        return render_template('edit_individual_bookitem.html',bookseries_id=bookseries_id, item=editedBookItem)
+
+# Delete BOOK
+@app.route('/bookseries/<int:bookseries_id>/book/<int:book_id>/delete',methods=['GET', 'POST'])
+def deleteBookItem(bookseries_id, book_id):
+    itemToDelete = session.query(IndividualBook).filter_by(id=book_id).one()
     if request.method == 'POST':
         session.delete(itemToDelete)
         session.commit()
         return redirect(url_for('booklist', bookseries_id=bookseries_id))
     else:
-        return render_template('deleteindividualbook.html', item=itemToDelete)
-
+        return render_template('delete_individualbook.html',bookseries_id=bookseries_id, book_id=book_id, item=itemToDelete)
+#Add new user sign up!
 @app.route('/register')
 def register():
  return render_template('register.html')
 
 if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
+    app.secret_key = 'super_SECRET_key'
     app.debug = True
     app.run(host='0.0.0.0', port=5000)

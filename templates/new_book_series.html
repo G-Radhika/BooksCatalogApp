@@ -2,8 +2,8 @@
 
 {% block body%}
 <div>
-  <h1> Add New Book </h1>
-  <form action="{{ url_for('newIndividualBook', individualbook_id=individualbook_id )}}" method = 'post'>
+  <h1> Add New Book Series </h1>
+  <form action="{{ url_for('newBookSeries', bookseries_id=bookseries_id )}}" method = 'post'>
     <dl>
     	<dt>Name:</dt>
     		<dd><input type ='text' size='30' name='name' required></dd>
@@ -18,5 +18,5 @@
     <input type='submit' value='Create'>
   </form>
 </div>
-{% endfor %}
+
 {% endblock %}
