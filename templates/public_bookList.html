@@ -1,0 +1,37 @@
+{% extends 'layout.html'%}
+
+{% block body%}
+
+<h1>{{bookseries.name}}</h1>
+  <div class="container">
+    <a href = '{{url_for('bookList_new', bookseries_id = bookseries.id) }}'>ADD A New Book To This Series...</a>
+    <div class = 'flash'>
+    		      {% with messages = get_flashed_messages() %}
+          {% if messages %}
+
+            <ul>
+            {% for message in messages %}
+                <li> <strong> {{ message }} </strong> </li>
+            {% endfor %}
+            </ul>
+            {% endif %}
+        {% endwith %}
+
+    </div>
+    </br>
+  </div>
+
+{% for i in items %}
+<div class="container">
+  <h4><strong>Name</strong>: {{i.name}}</h4>
+  <p><strong>Author</strong>: {{i.author}}</p>
+  <p><strong>Description</strong>: {{i.description}}</p>
+  <p><strong>Review</strong>: {{i.review}}</p>
+
+  <a href = '{{url_for('bookList_edit',bookseries_id=bookseries.id, book_id=i.id)}}' >Edit</a>
+  </br>
+  <a href = '{{url_for('bookList_delete', bookseries_id=bookseries.id, book_id=i.id)}}'>Delete</a>
+</div>
+{% endfor %}
+
+{% endblock %}

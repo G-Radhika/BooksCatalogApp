@@ -3,7 +3,7 @@
 {% block body %}
 <h1> Edit Book Series </h1>
 
-<form action="{{ url_for('editBookSeries',bookseries_id = bookseries.id)}}" method = 'post'>
+<form action="{{ url_for('bookSeries_edit',bookseries_id = bookseries.id)}}" method = 'post'>
 
 
 	<p>Name:</p>

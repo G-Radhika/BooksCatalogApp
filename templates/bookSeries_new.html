@@ -3,7 +3,7 @@
 {% block body%}
 <div>
   <h1> Add New Book Series </h1>
-  <form action="{{ url_for('newBookItem', bookseries_id=bookseries_id )}}" method = 'POST'>
+  <form action= "{{ url_for('bookSeries_new', bookseries_id=bookseries_id )}}" method = 'POST'>
     <dl>
     	<dt>Name:</dt>
     		<dd><input type ='text' size='30' name='name' required></dd>
@@ -12,7 +12,7 @@
       <dt>Language:</dt>
         <dd><input type = 'text' size = '8' name='language' required></dd>
       <dt>Description:</dt>
-        <dd><textarea name = 'description' rows='5' cols='40' required></textarea></dd>
+        <dd><textarea name = 'description' rows='5' cols='40' required></textarea></dd>s
     </dl>
     <input type='submit' value='Create'>
   </form>

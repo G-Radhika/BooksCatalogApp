@@ -6,6 +6,14 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
+class User(Base):
+    __tablename__ = 'user'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+    picture = Column(String(250))
+
 # BookSeries
 # id | name
 class BookSeries(Base):
@@ -13,6 +21,8 @@ class BookSeries(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
@@ -36,7 +46,8 @@ class IndividualBook(Base):
     review = Column(String(500))
     bookseries_id = Column(Integer, ForeignKey('bookseries.id'))
     bookseries = relationship(BookSeries)
-
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
@@ -51,6 +62,6 @@ class IndividualBook(Base):
             'review':self.review,
         }
 
-engine = create_engine('sqlite:///bookseries.db')
+engine = create_engine('sqlite:///bookseries_User.db')
 
 Base.metadata.create_all(engine)
