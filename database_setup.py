@@ -42,12 +42,13 @@ class IndividualBook(Base):
     language = Column(String(80), nullable=False)
     year = Column(Integer)
     genre = Column(String(80), nullable=False)
-    description = Column(String(250))
+    description = Column(String(500))
     review = Column(String(500))
     bookseries_id = Column(Integer, ForeignKey('bookseries.id'))
     bookseries = relationship(BookSeries)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""

@@ -288,18 +288,22 @@ def showBookList(bookseries_id):
         return render_template('public_bookList.html', items=items, bookseries=bookseries, creator=creator)
     else:
         return render_template('bookList.html', items=items, bookseries=bookseries, creator=creator)
-
+## http://localhost:5000/bookseries/11/book/new/
+##  "POST /bookseries/new/?bookseries_id= HTTP/1.1" 302 -
+## Bad Request:The browser (or proxy) sent a request that this server could not understand.
 @app.route('/bookseries/<int:bookseries_id>/book/new/', methods=['GET', 'POST'])
 def bookList_new(bookseries_id):
     if 'username' not in login_session:
         return redirect('/login')
     bookseries = session.query(BookSeries).filter_by(id=bookseries_id).one()
     if request.method == 'POST':
-        newBook = IndividualBook(name=request.form['name'],
-                                author=request.form['author'],
-                                language=request.form['language'],
-                                description=request.form['description'],
-                                review=request.form['review'],
+        newBook = IndividualBook(name=request.form.get('name'),
+                                author=request.form.get('author'),
+                                language=request.form.get('language'),
+                                year= request.form.get('year'),
+                                genre=request.form.get('genre'),
+                                description=request.form.get('description'),
+                                review=request.form.get('review'),
                                 bookseries_id=bookseries_id,
                                 user_id=bookseries.user_id)
         session.add(newBook)
